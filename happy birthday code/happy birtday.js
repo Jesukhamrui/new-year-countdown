@@ -35,7 +35,7 @@ let w = (c.width = window.innerWidth),
     fireworkShardAddedSize: 3,
     gravity: 0.1,
     upFlow: -0.1,
-    letterContemplatingWaitTime: 360,
+    letterContemplatingWaitTime: 1000, // 30 seconds at 60fps
     balloonSpawnTime: 20,
     balloonBaseInflateTime: 10,
     balloonAddedInflateTime: 10,
@@ -371,100 +371,6 @@ function generateBalloonPath(x, y, size) {
   );
   ctx.bezierCurveTo(x + size / 4, y - size, x + size / 2, y - size / 2, x, y);
 }
-
-// Heart animation class
-function Heart() {
-  this.x = Math.random() * w;
-  this.y = h + 20;
-  this.vx = (Math.random() - 0.5) * 2;
-  this.vy = -(opts.heartBaseVel + Math.random() * opts.heartAddedVel);
-  this.size = opts.heartBaseSize + Math.random() * opts.heartAddedSize;
-  this.life = opts.heartLifetime;
-  this.hue = Math.random() * 60 + 300; // Pink to red range
-}
-
-Heart.prototype.step = function() {
-  this.x += this.vx;
-  this.y += this.vy;
-  this.life--;
-  
-  var alpha = this.life / opts.heartLifetime;
-  ctx.fillStyle = `hsla(${this.hue}, 80%, 60%, ${alpha})`;
-  
-  // Draw heart shape
-  this.drawHeart(this.x, this.y, this.size);
-  
-  return this.life > 0;
-};
-
-Heart.prototype.drawHeart = function(x, y, size) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(size / 10, size / 10);
-  
-  ctx.beginPath();
-  ctx.moveTo(0, 3);
-  ctx.bezierCurveTo(-5, -2, -10, 1, -5, 8);
-  ctx.bezierCurveTo(-3, 10, 0, 12, 0, 12);
-  ctx.bezierCurveTo(0, 12, 3, 10, 5, 8);
-  ctx.bezierCurveTo(10, 1, 5, -2, 0, 3);
-  ctx.closePath();
-  ctx.fill();
-  
-  ctx.restore();
-};
-
-// Flower animation class
-function Flower() {
-  this.x = Math.random() * w;
-  this.y = h + 20;
-  this.vx = (Math.random() - 0.5) * 1.5;
-  this.vy = -(opts.flowerBaseVel + Math.random() * opts.flowerAddedVel);
-  this.size = opts.flowerBaseSize + Math.random() * opts.flowerAddedSize;
-  this.life = opts.flowerLifetime;
-  this.rotation = Math.random() * Tau;
-  this.rotationSpeed = (Math.random() - 0.5) * 0.1;
-  this.hue = Math.random() * 60 + 45; // Yellow to orange range
-}
-
-Flower.prototype.step = function() {
-  this.x += this.vx;
-  this.y += this.vy;
-  this.rotation += this.rotationSpeed;
-  this.life--;
-  
-  var alpha = this.life / opts.flowerLifetime;
-  ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${alpha})`;
-  
-  // Draw flower shape
-  this.drawFlower(this.x, this.y, this.size);
-  
-  return this.life > 0;
-};
-
-Flower.prototype.drawFlower = function(x, y, size) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(this.rotation);
-  
-  // Draw petals
-  for (let i = 0; i < 6; i++) {
-    ctx.save();
-    ctx.rotate(i * Tau / 6);
-    ctx.beginPath();
-    ctx.ellipse(0, -size * 0.6, size * 0.3, size * 0.6, 0, 0, Tau);
-    ctx.fill();
-    ctx.restore();
-  }
-  
-  // Draw center
-  ctx.fillStyle = `hsla(${this.hue + 30}, 80%, 40%, ${alpha})`;
-  ctx.beginPath();
-  ctx.arc(0, 0, size * 0.2, 0, Tau);
-  ctx.fill();
-  
-  ctx.restore();
-};
 
 var heartSpawnTimer = 0;
 var flowerSpawnTimer = 0;
