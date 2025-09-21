@@ -5,7 +5,7 @@ let w = (c.width = window.innerWidth),
 (hh = h / 2),
   (opts = {
     // change the text in here //
-    strings: ["HAPPY", "BIRTHDAY!", "to You", "Roshni!", "May all your dreams come true!"],
+    strings: ["HAPPY", "BIRTHDAY!", "to You", "dear", "May all your dreams come true!"],
 
     charSize: 30,
     charSpacing: 35,
