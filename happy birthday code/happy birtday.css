@@ -1,27 +1,113 @@
+/* Base styles */
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
 canvas {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
 }
+
 p {
-  margin: 0 0;
+  margin: 0;
   position: absolute;
-  font: 16px Verdana;
+  font: 1rem Verdana, Arial, sans-serif;
   color: #eee;
-  height: 25px;
-  top: calc(100vh - 30px);
+  height: auto;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   text-shadow: 0 0 2px white;
+  text-align: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  width: 100%;
 }
+
 p a {
   text-decoration: none;
   color: #aaa;
+  transition: color 0.3s ease;
 }
+
+p a:hover,
+p a:focus {
+  color: #fff;
+}
+
 span {
-  font-size: 11px;
+  font-size: 0.7rem;
 }
+
 p > a:first-of-type {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
-body {
-  overflow: hidden;
+
+/* Tablet styles */
+@media screen and (max-width: 768px) {
+  p {
+    font-size: 0.9rem;
+    bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+  
+  p > a:first-of-type {
+    font-size: 1.1rem;
+  }
+  
+  span {
+    font-size: 0.65rem;
+  }
+}
+
+/* Mobile phone styles */
+@media screen and (max-width: 480px) {
+  p {
+    font-size: 0.8rem;
+    bottom: 0.75rem;
+    padding: 0 0.25rem;
+  }
+  
+  p > a:first-of-type {
+    font-size: 1rem;
+  }
+  
+  span {
+    font-size: 0.6rem;
+  }
+}
+
+/* Very small mobile screens */
+@media screen and (max-width: 320px) {
+  p {
+    font-size: 0.7rem;
+    bottom: 0.5rem;
+  }
+  
+  p > a:first-of-type {
+    font-size: 0.9rem;
+  }
+  
+  span {
+    font-size: 0.55rem;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  p {
+    bottom: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  p > a:first-of-type {
+    font-size: 0.95rem;
+  }
 }

@@ -6,10 +6,10 @@ let w = (c.width = window.innerWidth),
   (opts = {
     // change the text in here //
     strings: ["HAPPY", "BIRTHDAY!", "to You", "Roshni!", "May all your dreams come true!"],
-
-    charSize: 30,
-    charSpacing: 35,
-    lineHeight: 40,
+    
+    charSize: Math.max(25, Math.min(40, window.innerWidth / 25)),
+    charSpacing: Math.max(30, Math.min(45, window.innerWidth / 30)),
+    lineHeight: Math.max(35, Math.min(50, window.innerWidth / 25)),
 
     cx: w / 2,
     cy: h / 2,
@@ -35,7 +35,7 @@ let w = (c.width = window.innerWidth),
     fireworkShardAddedSize: 3,
     gravity: 0.1,
     upFlow: -0.1,
-    letterContemplatingWaitTime: 360,
+    letterContemplatingWaitTime: 2000, // Increased time to read the text
     balloonSpawnTime: 20,
     balloonBaseInflateTime: 10,
     balloonAddedInflateTime: 10,
@@ -71,9 +71,52 @@ let w = (c.width = window.innerWidth),
   (TauQuarter = Tau / 4),
   (letters = []),
   (hearts = []),
-  (flowers = []);
+  (flowers = []),
+  (profileImage = null),
+  (imageLoaded = false);
 
 ctx.font = opts.charSize + "px Verdana";
+
+// Load profile image
+profileImage = new Image();
+profileImage.onload = function() {
+  imageLoaded = true;
+};
+// Add your photo URL here - replace with actual image path
+profileImage.src = "your-photo-name.jpg"; // Change this to your image file name
+
+// Function to draw circular image
+function drawCircularImage(ctx, img, x, y, radius) {
+  if (!imageLoaded) return;
+  
+  ctx.save();
+  
+  // Create circular clipping path
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  
+  // Draw image to fit in circle
+  const size = radius * 2;
+  ctx.drawImage(img, x - radius, y - radius, size, size);
+  
+  ctx.restore();
+  
+  // Add border around the circular image
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // Add glow effect
+  ctx.beginPath();
+  ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
 
 function Letter(char, x, y) {
   this.char = char;
@@ -87,10 +130,10 @@ function Letter(char, x, y) {
 
   var hue = (x / calc.totalWidth) * 360;
 
-  this.color = "hsl(hue,80%,50%)".replace("hue", hue);
-  this.lightAlphaColor = "hsla(hue,80%,light%,alp)".replace("hue", hue);
-  this.lightColor = "hsl(hue,80%,light%)".replace("hue", hue);
-  this.alphaColor = "hsla(hue,80%,50%,alp)".replace("hue", hue);
+  this.color = "hsl(hue,90%,60%)".replace("hue", hue);
+  this.lightAlphaColor = "hsla(hue,90%,light%,alp)".replace("hue", hue);
+  this.lightColor = "hsl(hue,90%,light%)".replace("hue", hue);
+  this.alphaColor = "hsla(hue,90%,60%,alp)".replace("hue", hue);
 
   this.reset();
 }
@@ -223,8 +266,18 @@ Letter.prototype.step = function () {
 
       if (this.tick2 >= this.circleFadeTime) this.circleFading = false;
     } else {
-      ctx.fillStyle = this.lightColor.replace("light", 70);
+      // Add text shadow for better readability
+      ctx.shadowColor = "#000";
+      ctx.shadowBlur = 3;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      ctx.fillStyle = this.lightColor.replace("light", 85);
       ctx.fillText(this.char, this.x + this.dx, this.y + this.dy);
+      // Reset shadow
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
     }
 
     for (var i = 0; i < this.shards.length; ++i) {
@@ -372,100 +425,6 @@ function generateBalloonPath(x, y, size) {
   ctx.bezierCurveTo(x + size / 4, y - size, x + size / 2, y - size / 2, x, y);
 }
 
-// Heart animation class
-function Heart() {
-  this.x = Math.random() * w;
-  this.y = h + 20;
-  this.vx = (Math.random() - 0.5) * 2;
-  this.vy = -(opts.heartBaseVel + Math.random() * opts.heartAddedVel);
-  this.size = opts.heartBaseSize + Math.random() * opts.heartAddedSize;
-  this.life = opts.heartLifetime;
-  this.hue = Math.random() * 60 + 300; // Pink to red range
-}
-
-Heart.prototype.step = function() {
-  this.x += this.vx;
-  this.y += this.vy;
-  this.life--;
-  
-  var alpha = this.life / opts.heartLifetime;
-  ctx.fillStyle = `hsla(${this.hue}, 80%, 60%, ${alpha})`;
-  
-  // Draw heart shape
-  this.drawHeart(this.x, this.y, this.size);
-  
-  return this.life > 0;
-};
-
-Heart.prototype.drawHeart = function(x, y, size) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(size / 10, size / 10);
-  
-  ctx.beginPath();
-  ctx.moveTo(0, 3);
-  ctx.bezierCurveTo(-5, -2, -10, 1, -5, 8);
-  ctx.bezierCurveTo(-3, 10, 0, 12, 0, 12);
-  ctx.bezierCurveTo(0, 12, 3, 10, 5, 8);
-  ctx.bezierCurveTo(10, 1, 5, -2, 0, 3);
-  ctx.closePath();
-  ctx.fill();
-  
-  ctx.restore();
-};
-
-// Flower animation class
-function Flower() {
-  this.x = Math.random() * w;
-  this.y = h + 20;
-  this.vx = (Math.random() - 0.5) * 1.5;
-  this.vy = -(opts.flowerBaseVel + Math.random() * opts.flowerAddedVel);
-  this.size = opts.flowerBaseSize + Math.random() * opts.flowerAddedSize;
-  this.life = opts.flowerLifetime;
-  this.rotation = Math.random() * Tau;
-  this.rotationSpeed = (Math.random() - 0.5) * 0.1;
-  this.hue = Math.random() * 60 + 45; // Yellow to orange range
-}
-
-Flower.prototype.step = function() {
-  this.x += this.vx;
-  this.y += this.vy;
-  this.rotation += this.rotationSpeed;
-  this.life--;
-  
-  var alpha = this.life / opts.flowerLifetime;
-  ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${alpha})`;
-  
-  // Draw flower shape
-  this.drawFlower(this.x, this.y, this.size);
-  
-  return this.life > 0;
-};
-
-Flower.prototype.drawFlower = function(x, y, size) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(this.rotation);
-  
-  // Draw petals
-  for (let i = 0; i < 6; i++) {
-    ctx.save();
-    ctx.rotate(i * Tau / 6);
-    ctx.beginPath();
-    ctx.ellipse(0, -size * 0.6, size * 0.3, size * 0.6, 0, 0, Tau);
-    ctx.fill();
-    ctx.restore();
-  }
-  
-  // Draw center
-  ctx.fillStyle = `hsla(${this.hue + 30}, 80%, 40%, ${alpha})`;
-  ctx.beginPath();
-  ctx.arc(0, 0, size * 0.2, 0, Tau);
-  ctx.fill();
-  
-  ctx.restore();
-};
-
 var heartSpawnTimer = 0;
 var flowerSpawnTimer = 0;
 
@@ -484,6 +443,12 @@ function anim() {
   }
 
   ctx.translate(-hw, -hh);
+
+  // Draw circular profile image in center
+  if (imageLoaded) {
+    const imageRadius = Math.min(50, Math.max(25, w * 0.08)); // Responsive size
+    drawCircularImage(ctx, profileImage, w / 2, h / 2, imageRadius);
+  }
 
   // Spawn and animate hearts
   heartSpawnTimer++;
@@ -546,5 +511,10 @@ window.addEventListener("resize", function () {
   hw = w / 2;
   hh = h / 2;
 
+  // Update responsive font size on resize
+  opts.charSize = Math.max(25, Math.min(40, window.innerWidth / 25));
+  opts.charSpacing = Math.max(30, Math.min(45, window.innerWidth / 30));
+  opts.lineHeight = Math.max(35, Math.min(50, window.innerWidth / 25));
+  
   ctx.font = opts.charSize + "px Verdana";
 });
